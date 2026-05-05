@@ -431,38 +431,16 @@ function setArc(pct){
 }
 
 function checkBuffer(){
-  const isMobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
-  // Sur mobile les navigateurs bloquent le préchargement vidéo
-  // On fait un faux chargement animé + fallback timer
-  if(isMobile){
-    let fakeP=0;
-    const interval=setInterval(()=>{
-      fakeP+=Math.random()*8+4;
-      if(fakeP>=100) fakeP=100;
-      setArc(fakeP);
-      if(fakeP<30) statusEl.textContent='Chargement';
-      else if(fakeP<60) statusEl.textContent='Préparation';
-      else if(fakeP<90) statusEl.textContent='Presque prêt';
-      if(fakeP>=100){
-        clearInterval(interval);
-        unlockCTA();
-      }
-    },150);
-    return;
-  }
-
-  // Desktop — vrai check du buffer
+  // On veut que intro_01 ET intro_02 soient bien chargées
   const v1=document.createElement('video');
   const v2=document.createElement('video');
   v1.preload='auto'; v2.preload='auto';
   v1.src=INTRO_VIDEOS[0]; v2.src=INTRO_VIDEOS[1];
 
   let p1=0, p2=0;
-  // Fallback timer — si rien ne charge après 12s on débloque quand même
-  const fallback=setTimeout(()=>{ if(!loadReady) unlockCTA(); },12000);
 
   function update(){
+    // calcule le pourcentage chargé de chaque vidéo
     function getPct(v){
       if(!v.duration||v.duration===0) return 0;
       if(v.buffered.length===0) return 0;
@@ -472,12 +450,22 @@ function checkBuffer(){
     p1=getPct(v1); p2=getPct(v2);
     const avg=(p1+p2)/2;
     setArc(avg);
+
+    // Status text
     if(avg<30) statusEl.textContent='Chargement';
     else if(avg<60) statusEl.textContent='Préparation';
     else if(avg<90) statusEl.textContent='Presque prêt';
+
+    // Ready quand les deux sont chargées à plus de 85%
     if(p1>=85 && p2>=85 && !loadReady){
-      clearTimeout(fallback);
-      unlockCTA();
+      loadReady=true;
+      setArc(100);
+      arc.classList.remove('active'); arc.classList.add('ready');
+      pctEl.classList.add('ready');
+      statusEl.textContent='Prêt'; statusEl.classList.add('ready');
+      subEl.textContent='entrer';
+      ctaEl.classList.add('vis');
+      attachHover(ctaEl);
     } else if(!loadReady){
       setTimeout(update,300);
     }
@@ -488,18 +476,6 @@ function checkBuffer(){
   v1.addEventListener('canplaythrough',update);
   v2.addEventListener('canplaythrough',update);
   update();
-}
-
-function unlockCTA(){
-  if(loadReady) return;
-  loadReady=true;
-  setArc(100);
-  arc.classList.remove('active'); arc.classList.add('ready');
-  pctEl.classList.add('ready');
-  statusEl.textContent='Prêt'; statusEl.classList.add('ready');
-  subEl.textContent='entrer';
-  ctaEl.classList.add('vis');
-  attachHover(ctaEl);
 }
 
 // Lance le check dès que le DOM est prêt

@@ -52,10 +52,11 @@ body.hov #cur-dot { opacity:0; }
 #bbar {
   position:fixed; bottom:26px; left:28px; z-index:300;
   display:flex; align-items:center; gap:14px;
+  opacity:0; pointer-events:none;
+  transition:opacity .8s;
 }
-.bb-lang { opacity:0; pointer-events:none; transition:opacity .9s ease; }
-#snd-btn { opacity:0; pointer-events:none; transition:opacity .9s ease; display:flex; align-items:flex-end; gap:2px; height:10px; background:none; border:none; cursor:none; padding:0; }
-.bb-sep { opacity:0; transition:opacity .9s ease; }
+#bbar.vis { opacity:1; pointer-events:all; }
+#bbar.hidden { opacity:0; pointer-events:none; }
 
 .bb-lang {
   font-family:var(--f); font-size:8px; font-weight:200;
@@ -125,7 +126,7 @@ body.hov #cur-dot { opacity:0; }
 @media(max-width:768px){ #bg-door { background-image:url('door-mobile.jpg'); } }
 #bg-door::after { content:''; position:absolute; inset:0; background:linear-gradient(to top,rgba(0,0,0,.92) 0%,rgba(0,0,0,.15) 60%,rgba(0,0,0,.5) 100%); }
 
-#bg-podium { position:absolute; inset:0; opacity:0; background:url('bg-desktop.jpg') center center/cover no-repeat #000; transition:opacity 2.5s ease; }
+#bg-podium { position:absolute; inset:0; opacity:0; background:url('bg-desktop.jpg') center center/cover no-repeat #000; transition:opacity 1.2s ease; }
 @media(max-width:768px){ #bg-podium { background-image:url('bg-mobile.jpg'); } }
 #bg-podium::after { content:''; position:absolute; inset:0; background:rgba(0,0,0,.5); }
 
@@ -412,18 +413,11 @@ function cycleLang(){
 }
 
 // ══ PRELOAD VIDEOS ══
-// door-open.mp4 joue directement (7MB, pas besoin de preload)
-// Les intro videos chargent en arrière-plan dès le clic Welcome
 const INTRO=['intro_01.mp4','intro_02.mp4','intro_03.mp4'];
 let preloaded=false;
 function startPreload(){
   if(preloaded)return; preloaded=true;
-  INTRO.forEach(src=>{
-    const v=document.createElement('video');
-    v.preload='auto'; v.src=src; v.load();
-    v.style.display='none';
-    document.body.appendChild(v);
-  });
+  INTRO.forEach(src=>{const v=document.createElement('video');v.preload='auto';v.src=src;v.load();v.style.display='none';document.body.appendChild(v);});
 }
 
 // ══ TUNNEL PANELS ══
@@ -438,10 +432,9 @@ let langChosen=false;
 
 function startTunnel(){
   startPreload();
-  const isMobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-  const doorSrc=isMobile?'door-open-mobile.mp4':'door-open-desktop.mp4';
+  // Tente de jouer la vidéo porte
   const dv=document.getElementById('dv'), dvw=document.getElementById('dvw');
-  dv.src=doorSrc; dv.load();
+  dv.src='door-open.mp4'; dv.load();
   dv.play().then(()=>{
     dvw.classList.add('vis');
     document.getElementById('ww').classList.add('out');
@@ -451,37 +444,23 @@ function startTunnel(){
 
 function switchPodium(){
   document.getElementById('ww').classList.add('out');
-  // 0.5s sur le noir puis fade in progressif 2.5s
-  setTimeout(()=>{
-    document.getElementById('bg-podium').style.opacity='1';
-    setTimeout(()=>document.getElementById('bg-door').style.opacity='0',600);
-  },500);
+  document.getElementById('bg-podium').style.opacity='1';
+  setTimeout(()=>document.getElementById('bg-door').style.opacity='0',600);
+  // Affiche la barre lang/son
   document.getElementById('bbar').classList.add('vis');
-  // Lang apparaît seulement après que le bg soit bien visible
-  setTimeout(()=>showP('p-lang'),3200);
+  setTimeout(()=>showP('p-lang'),900);
 }
 
 function selectLang(l){
   if(langChosen)return;
   langChosen=true;
   lang=l; applyLang();
-
+  // Blink son
+  document.querySelectorAll('.si').forEach(s=>{s.classList.remove('blink');void s.offsetWidth;s.classList.add('blink');});
+  // Séquence : hide lang → son → mani1 → mani2 → enter
   hideP('p-lang',()=>{
-    // ✅ BOUTON LANGUE — visible et fonctionnel dès que le panel lang disparaît, pour toujours
-    const ld=document.getElementById('lang-disp');
-    ld.style.opacity='1'; ld.style.pointerEvents='all';
-
     showP('p-sound');
-    // Blink son icon pour attirer l'attention
-    document.querySelectorAll('.si').forEach(s=>{s.classList.remove('blink');void s.offsetWidth;s.classList.add('blink');});
-
     setTimeout(()=>hideP('p-sound',()=>{
-      // ✅ BOUTON SON — visible et fonctionnel dès que le panel son disparaît, pour toujours
-      const sb=document.getElementById('snd-btn');
-      const sep=document.getElementById('bb-sep');
-      sb.style.opacity='1'; sb.style.pointerEvents='all';
-      if(sep) sep.style.opacity='1';
-
       showP('p-mani1');
       setTimeout(()=>hideP('p-mani1',()=>{
         showP('p-mani2');
@@ -495,17 +474,9 @@ function selectLang(l){
 
 function enterUnderground(){
   hideP('p-enter',()=>closeOnboard(()=>{
-    // Boutons lang/son restent visibles mais on masque juste pendant l'intro video
-    const ld=document.getElementById('lang-disp'), sb2=document.getElementById('snd-btn');
-    const prevLdOp=ld.style.opacity, prevSbOp=sb2.style.opacity;
-    ld.style.opacity='0'; ld.style.pointerEvents='none';
-    sb2.style.opacity='0'; sb2.style.pointerEvents='none';
+    document.getElementById('bbar').classList.add('hidden');
     document.getElementById('intro-wrap').classList.add('vis');
-    loadClip(0, ()=>{
-      // Restore après les vidéos
-      ld.style.opacity=prevLdOp; ld.style.pointerEvents='all';
-      sb2.style.opacity=prevSbOp; sb2.style.pointerEvents='all';
-    });
+    loadClip(0);
   }));
 }
 
@@ -522,15 +493,15 @@ function closeOnboard(cb){
 
 // ══ INTRO VIDEO ══
 const iWrap=document.getElementById('intro-wrap'), iVid=document.getElementById('intro-video');
-function loadClip(idx, onDone){
+function loadClip(idx){
   if(idx>=INTRO.length){
     iWrap.style.transition='opacity .6s ease'; iWrap.style.opacity='0';
-    setTimeout(()=>{ iWrap.classList.remove('vis'); iWrap.style.opacity=''; iWrap.style.transition=''; if(onDone)onDone(); launchExp(); },650);
+    setTimeout(()=>{ iWrap.classList.remove('vis'); iWrap.style.opacity=''; iWrap.style.transition=''; launchExp(); },650);
     return;
   }
   iVid.src=INTRO[idx]; iVid.load();
   iVid.play().catch(e=>console.log(e));
-  iVid.onended=()=>loadClip(idx+1, onDone);
+  iVid.onended=()=>loadClip(idx+1);
 }
 
 // ══ SOUND ══
@@ -642,8 +613,8 @@ function launchAt(key){
   document.getElementById('shop-link').classList.add('vis');
   document.getElementById('prog').classList.add('vis');
   document.getElementById('lvl').classList.add('vis');
+  document.getElementById('bbar').classList.add('vis');
   document.getElementById('bbar').classList.remove('hidden');
-  // Lang et son déjà visibles depuis le tunnel
   sA.innerHTML=mkP(key);sA.style.opacity='1';sB.style.opacity='0';
   const s=SCENES[key];setProgress(s.lvl||1);
   if(s.loop)setTimeout(()=>showChoices(key),1500);

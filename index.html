@@ -278,7 +278,7 @@ body.hov #cur-dot { opacity:0; }
 <div id="onboard">
   <div id="bg-door"></div>
   <div id="bg-podium"></div>
-  <div id="dvw"><video id="dv" playsinline webkit-playsinline muted></video></div>
+  <div id="dvw"><video id="dv" playsinline webkit-playsinline></video></div>
 
   <!-- WELCOME -->
   <div id="ww"><button id="wb" onclick="firstClick()">Welcome</button></div>
@@ -455,7 +455,15 @@ function firstClick(){
   ww.style.pointerEvents='none';
   setTimeout(()=>{ ww.style.display='none'; }, 800);
 
-  // 3. Après 5s — affiche "Open the door"
+  // 3. ✅ BOUTONS LANGUE + SON — visibles et fonctionnels DÈS MAINTENANT pour toujours
+  const ld=document.getElementById('lang-disp');
+  const sb=document.getElementById('snd-btn');
+  const sep=document.getElementById('bb-sep');
+  ld.style.opacity='1'; ld.style.pointerEvents='all';
+  sb.style.opacity='1'; sb.style.pointerEvents='all';
+  if(sep) sep.style.opacity='1';
+
+  // 4. Après 5s — affiche "Open the door"
   setTimeout(()=>{
     document.getElementById('open-btn-wrap').classList.add('vis');
     aH(document.getElementById('open-btn'));
@@ -483,15 +491,6 @@ function switchPodium(){
     document.getElementById('bg-podium').style.opacity='1';
     setTimeout(()=>document.getElementById('bg-door').style.opacity='0',600);
   },500);
-
-  // ✅ LANG + SON — visibles et fonctionnels DÈS maintenant
-  const ld=document.getElementById('lang-disp');
-  const sb=document.getElementById('snd-btn');
-  const sep=document.getElementById('bb-sep');
-  ld.style.opacity='1'; ld.style.pointerEvents='all';
-  sb.style.opacity='1'; sb.style.pointerEvents='all';
-  if(sep) sep.style.opacity='1';
-
   setTimeout(()=>showP('p-lang'),3200);
 }
 

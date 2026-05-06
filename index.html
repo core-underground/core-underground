@@ -4,59 +4,38 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CORE UNDERGROUND</title>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital@1&family=Unbounded:wght@100;200;300&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-:root {
-  --f: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  --f-serif: Georgia, 'Times New Roman', serif;
-  --spd: 1s;
-}
+:root { --f:'Unbounded',sans-serif; --fs:'Libre Baskerville',serif; --spd:1s; }
 html, body { width:100%; height:100%; background:#000; overflow:hidden; cursor:none; }
 
-/* ══ CURSOR — ASTERISK ══ */
-#cur {
-  position:fixed; pointer-events:none; z-index:9999;
-  transform:translate(-50%,-50%);
-  font-family:var(--f); font-size:18px; font-weight:300;
-  color:rgba(255,255,255,0.8);
-  line-height:1; user-select:none;
-  transition:transform .15s ease, opacity .15s;
-}
-body.hovering #cur { transform:translate(-50%,-50%) scale(1.4); color:rgba(255,255,255,0.5); }
-
-/* RIPPLE */
-.ripple {
-  position:fixed; pointer-events:none; z-index:9998;
-  border:1px solid rgba(255,255,255,0.6);
-  border-radius:50%;
-  width:0; height:0;
-  transform:translate(-50%,-50%);
-  animation:rippleOut .7s ease-out forwards;
-}
-@keyframes rippleOut {
-  0%   { width:0; height:0; opacity:.7; }
-  100% { width:80px; height:80px; opacity:0; }
-}
+/* ══ CURSOR ══ */
+#cur { position:fixed; pointer-events:none; z-index:9999; transform:translate(-50%,-50%); width:1px; height:1px; }
+#cur::before { content:''; position:absolute; width:22px; height:22px; border:1px solid rgba(255,255,255,.6); border-radius:50%; top:-11px; left:-11px; transition:width .25s,height .25s,top .25s,left .25s,border-color .25s,background .25s; }
+#cur-dot { position:fixed; width:4px; height:4px; border-radius:50%; background:white; pointer-events:none; z-index:9998; transform:translate(-50%,-50%); transition:opacity .2s; }
+body.hov #cur::before { width:44px; height:44px; top:-22px; left:-22px; border-color:rgba(255,255,255,.2); background:rgba(255,255,255,.03); }
+body.hov #cur-dot { opacity:0; }
 
 /* ══ GRAIN ══ */
 #grain { position:fixed; inset:0; pointer-events:none; z-index:100; opacity:0.05;
   background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   background-size:256px; animation:gm .12s steps(1) infinite; }
-@keyframes gm { 0%{background-position:0 0} 25%{background-position:-60px -30px} 50%{background-position:-120px 0} 75%{background-position:-60px 60px} }
+@keyframes gm { 0%{background-position:0 0}25%{background-position:-60px -30px}50%{background-position:-120px 0}75%{background-position:-60px 60px} }
 
-/* ══ VIGNETTE ══ */
+/* ══ VIGNETTE / SCAN ══ */
 #vig { position:fixed; inset:0; pointer-events:none; z-index:99; background:radial-gradient(ellipse 85% 85% at 50% 50%, transparent 30%, rgba(0,0,0,.92) 100%); }
-#scan { position:fixed; inset:0; pointer-events:none; z-index:98; opacity:.02; background:repeating-linear-gradient(to bottom,transparent 0,transparent 2px,rgba(255,255,255,.1) 2px,rgba(255,255,255,.1) 3px); }
+#scan { position:fixed; inset:0; pointer-events:none; z-index:98; opacity:.022; background:repeating-linear-gradient(to bottom,transparent 0,transparent 2px,rgba(255,255,255,.1) 2px,rgba(255,255,255,.1) 3px); }
 
 /* ══ CORNERS ══ */
 .corner { position:fixed; width:16px; height:16px; z-index:201; opacity:0; transition:opacity 1s; }
 .corner.vis { opacity:.25; }
 .corner::before,.corner::after { content:''; position:absolute; background:rgba(255,255,255,.6); }
 .corner::before { width:1px; height:16px; } .corner::after { width:16px; height:1px; }
-.corner.tl{top:20px;left:20px} .corner.tl::before{top:0;left:0} .corner.tl::after{top:0;left:0}
-.corner.tr{top:20px;right:20px} .corner.tr::before{top:0;right:0} .corner.tr::after{top:0;right:0}
-.corner.bl{bottom:20px;left:20px} .corner.bl::before{bottom:0;left:0} .corner.bl::after{bottom:0;left:0}
-.corner.br{bottom:20px;right:20px} .corner.br::before{bottom:0;right:0} .corner.br::after{bottom:0;right:0}
+.corner.tl{top:20px;left:20px}.corner.tl::before{top:0;left:0}.corner.tl::after{top:0;left:0}
+.corner.tr{top:20px;right:20px}.corner.tr::before{top:0;right:0}.corner.tr::after{top:0;right:0}
+.corner.bl{bottom:20px;left:20px}.corner.bl::before{bottom:0;left:0}.corner.bl::after{bottom:0;left:0}
+.corner.br{bottom:20px;right:20px}.corner.br::before{bottom:0;right:0}.corner.br::after{bottom:0;right:0}
 
 /* ══ PROGRESS + LEVEL ══ */
 #prog { position:fixed; top:0; left:0; right:0; height:1px; z-index:202; display:flex; opacity:0; transition:opacity .8s; }
@@ -65,60 +44,76 @@ body.hovering #cur { transform:translate(-50%,-50%) scale(1.4); color:rgba(255,2
 .ps+.ps { border-left:1px solid rgba(255,255,255,.03); }
 .ps::after { content:''; position:absolute; inset:0; background:rgba(255,255,255,.35); transform:translateX(-100%); transition:transform .9s cubic-bezier(.4,0,.2,1); }
 .ps.done::after { transform:translateX(0); }
-#lvl { position:fixed; top:24px; left:50%; transform:translateX(-50%); z-index:202; font-family:var(--f-serif); font-style:italic; font-size:11px; letter-spacing:.3em; color:rgba(255,255,255,.22); opacity:0; transition:opacity .8s; }
+#lvl { position:fixed; top:24px; left:50%; transform:translateX(-50%); z-index:202; font-family:var(--fs); font-style:italic; font-size:11px; letter-spacing:.3em; color:rgba(255,255,255,.22); opacity:0; transition:opacity .8s; }
 #lvl.vis { opacity:1; }
 
-/* ══ BOTTOM BAR ══ */
-#bbar { position:fixed; bottom:26px; left:28px; z-index:202; display:flex; align-items:center; gap:14px; opacity:0; transition:opacity 1s; }
-#bbar.vis { opacity:1; }
-.bb { font-family:var(--f); font-size:9px; font-weight:300; letter-spacing:.3em; text-transform:uppercase; color:rgba(255,255,255,.4); background:none; border:none; cursor:none; transition:color .3s; }
-.bb:hover { color:rgba(255,255,255,.8); }
+/* ══ BOTTOM BAR — LANGUE + SON ══ */
+/* Visible dès le tunnel, reste visible tout le long sauf pendant les vidéos intro */
+#bbar {
+  position:fixed; bottom:26px; left:28px; z-index:300;
+  display:flex; align-items:center; gap:14px;
+  opacity:0; pointer-events:none;
+  transition:opacity .8s;
+}
+#bbar.vis { opacity:1; pointer-events:all; }
+#bbar.hidden { opacity:0; pointer-events:none; }
+
+.bb-lang {
+  font-family:var(--f); font-size:8px; font-weight:200;
+  letter-spacing:.35em; text-transform:uppercase;
+  color:rgba(255,255,255,.45); background:none; border:none; cursor:none;
+  transition:color .3s;
+}
+.bb-lang:hover { color:rgba(255,255,255,.9); }
 .bb-sep { width:1px; height:10px; background:rgba(255,255,255,.2); }
-#snd-icon { display:flex; align-items:flex-end; gap:2px; height:10px; background:none; border:none; cursor:none; }
+#snd-btn {
+  display:flex; align-items:flex-end; gap:2px; height:10px;
+  background:none; border:none; cursor:none; padding:0;
+}
 .si { width:2px; border-radius:1px; background:rgba(255,255,255,.4); }
 .si:nth-child(1){height:4px;animation:sw 1.1s ease infinite}
 .si:nth-child(2){height:8px;animation:sw 1.1s ease .2s infinite}
 .si:nth-child(3){height:5px;animation:sw 1.1s ease .4s infinite}
-.si.paused { animation-play-state:paused!important; opacity:.2; }
-.si.blink-anim { animation:siBlink 2.5s ease 3 !important; }
-@keyframes sw { 0%,100%{transform:scaleY(.4)} 50%{transform:scaleY(1)} }
-@keyframes siBlink { 0%,100%{opacity:.15} 50%{opacity:1} }
+.si.paused{animation-play-state:paused!important;opacity:.2;}
+.si.blink{animation:siBlink 2.5s ease 3!important;}
+@keyframes sw{0%,100%{transform:scaleY(.4)}50%{transform:scaleY(1)}}
+@keyframes siBlink{0%,100%{opacity:.15}50%{opacity:1}}
 
 /* ══ SHOP ══ */
-#shop-link { position:fixed; right:28px; bottom:26px; z-index:202; font-family:var(--f); font-size:9px; font-weight:300; letter-spacing:.35em; text-transform:uppercase; color:white; text-decoration:none; opacity:0; cursor:none; transition:opacity .8s; display:flex; align-items:center; gap:10px; }
+#shop-link { position:fixed; right:28px; bottom:26px; z-index:202; font-family:var(--f); font-size:8px; font-weight:200; letter-spacing:.38em; text-transform:uppercase; color:white; text-decoration:none; opacity:0; cursor:none; transition:opacity .8s; display:flex; align-items:center; gap:10px; }
 #shop-link.vis { opacity:.35; }
 #shop-link:hover { opacity:1!important; }
 #shop-link::before { content:''; display:block; width:20px; height:1px; background:rgba(255,255,255,.4); transition:width .4s; }
 #shop-link:hover::before { width:40px; }
 
 /* ══ REWATCH ══ */
-#rew { position:fixed; top:24px; left:50%; transform:translateX(-50%); z-index:202; font-family:var(--f); font-size:9px; font-weight:300; letter-spacing:.4em; text-transform:uppercase; color:rgba(255,255,255,.28); background:none; border:none; cursor:none; opacity:0; transition:opacity .5s,color .3s; padding:8px 12px; }
+#rew { position:fixed; top:24px; left:50%; transform:translateX(-50%); z-index:202; font-family:var(--f); font-size:8px; font-weight:200; letter-spacing:.4em; text-transform:uppercase; color:rgba(255,255,255,.28); background:none; border:none; cursor:none; opacity:0; transition:opacity .5s,color .3s; padding:8px 12px; }
 #rew.vis { opacity:1; } #rew:hover { color:rgba(255,255,255,.8); }
 
 /* ══ CHOICES ══ */
 #choices { position:fixed; bottom:0; left:0; right:0; height:28vh; display:flex; align-items:center; justify-content:center; z-index:202; opacity:0; pointer-events:none; transition:opacity .7s; }
 #choices.vis { opacity:1; pointer-events:all; }
-.cbtn { position:relative; font-family:var(--f); font-size:9px; font-weight:300; letter-spacing:.55em; text-transform:uppercase; color:rgba(255,255,255,.45); background:none; border:none; cursor:none; padding:18px 38px; opacity:0; transition:color .4s,letter-spacing .4s; overflow:hidden; }
+.cbtn { position:relative; font-family:var(--f); font-size:9px; font-weight:200; letter-spacing:.55em; text-transform:uppercase; color:rgba(255,255,255,.45); background:none; border:none; cursor:none; padding:18px 38px; opacity:0; transition:color .4s,letter-spacing .4s; overflow:hidden; }
 .cbtn+.cbtn::before { content:''; position:absolute; left:0; top:50%; transform:translateY(-50%); width:1px; height:14px; background:rgba(255,255,255,.15); }
 .cbtn::after { content:''; position:absolute; bottom:10px; left:50%; transform:translateX(-50%) scaleX(0); width:calc(100% - 76px); height:1px; background:rgba(255,255,255,.35); transform-origin:left; transition:transform .45s cubic-bezier(.4,0,.2,1); }
 .cbtn:hover { color:rgba(255,255,255,1); letter-spacing:.68em; }
 .cbtn:hover::after { transform:translateX(-50%) scaleX(1); }
 .cbtn.in { animation:cIn .7s ease forwards; }
-@keyframes cIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+@keyframes cIn { from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)} }
 
-#idle { position:fixed; bottom:18vh; left:50%; transform:translateX(-50%); z-index:201; font-family:var(--f-serif); font-style:italic; font-size:11px; letter-spacing:.3em; color:rgba(255,255,255,.1); opacity:0; transition:opacity 1s; pointer-events:none; white-space:nowrap; }
+#idle { position:fixed; bottom:18vh; left:50%; transform:translateX(-50%); z-index:201; font-family:var(--fs); font-style:italic; font-size:11px; letter-spacing:.3em; color:rgba(255,255,255,.1); opacity:0; transition:opacity 1s; pointer-events:none; white-space:nowrap; }
 #idle.vis { opacity:1; }
 
 /* ══ SCENES ══ */
 #sa,#sb { position:fixed; inset:0; transition:opacity var(--spd) ease; }
 #sb { opacity:0; }
 .vp { position:absolute; inset:0; display:flex; align-items:flex-end; padding:0 0 72px 34px; }
-.vn { font-family:var(--f-serif); font-style:italic; font-size:9px; color:rgba(255,255,255,.06); letter-spacing:.1em; margin-bottom:4px; }
-.vl { font-family:var(--f); font-size:7px; font-weight:300; letter-spacing:.28em; text-transform:uppercase; color:rgba(255,255,255,.05); }
-.s1{background:linear-gradient(160deg,#04040a,#000)} .s2{background:linear-gradient(160deg,#06050c,#000)}
-.s3{background:linear-gradient(160deg,#050a07,#000)} .s4{background:linear-gradient(160deg,#04080e,#000)}
-.s5{background:linear-gradient(160deg,#080609,#000)} .s6{background:linear-gradient(160deg,#060c0a,#000)}
-.s7{background:linear-gradient(160deg,#0c0b04,#000)} .s8{background:linear-gradient(160deg,#0a0408,#000)}
+.vn { font-family:var(--fs); font-style:italic; font-size:9px; color:rgba(255,255,255,.06); letter-spacing:.1em; margin-bottom:4px; }
+.vl { font-family:var(--f); font-size:7px; font-weight:200; letter-spacing:.28em; text-transform:uppercase; color:rgba(255,255,255,.05); }
+.s1{background:linear-gradient(160deg,#04040a,#000)}.s2{background:linear-gradient(160deg,#06050c,#000)}
+.s3{background:linear-gradient(160deg,#050a07,#000)}.s4{background:linear-gradient(160deg,#04080e,#000)}
+.s5{background:linear-gradient(160deg,#080609,#000)}.s6{background:linear-gradient(160deg,#060c0a,#000)}
+.s7{background:linear-gradient(160deg,#0c0b04,#000)}.s8{background:linear-gradient(160deg,#0a0408,#000)}
 
 /* ══════════════════════════════
    ONBOARDING
@@ -126,168 +121,147 @@ body.hovering #cur { transform:translate(-50%,-50%) scale(1.4); color:rgba(255,2
 #onboard { position:fixed; inset:0; z-index:600; background:#000; transition:opacity 1.4s ease; }
 #onboard.out { opacity:0; pointer-events:none; }
 
-/* BG — PORTE (phase 1) */
-#bg-door {
-  position:absolute; inset:0;
-  background:url('door-desktop.jpg') center center/cover no-repeat #000;
-  transition:opacity 1.2s ease;
-}
+/* BG */
+#bg-door { position:absolute; inset:0; background:url('door-desktop.jpg') center center/cover no-repeat #000; transition:opacity 1.2s ease; }
 @media(max-width:768px){ #bg-door { background-image:url('door-mobile.jpg'); } }
-#bg-door::after { content:''; position:absolute; inset:0; background:linear-gradient(to top,rgba(0,0,0,.9) 0%,rgba(0,0,0,.2) 60%,rgba(0,0,0,.5) 100%); }
+#bg-door::after { content:''; position:absolute; inset:0; background:linear-gradient(to top,rgba(0,0,0,.92) 0%,rgba(0,0,0,.15) 60%,rgba(0,0,0,.5) 100%); }
 
-/* BG — PODIUM (phase 3+) */
-#bg-podium {
-  position:absolute; inset:0; opacity:0;
-  background:url('bg-desktop.jpg') center center/cover no-repeat #000;
-  transition:opacity 1.2s ease;
-}
+#bg-podium { position:absolute; inset:0; opacity:0; background:url('bg-desktop.jpg') center center/cover no-repeat #000; transition:opacity 1.2s ease; }
 @media(max-width:768px){ #bg-podium { background-image:url('bg-mobile.jpg'); } }
-#bg-podium::after { content:''; position:absolute; inset:0; background:rgba(0,0,0,.55); }
+#bg-podium::after { content:''; position:absolute; inset:0; background:rgba(0,0,0,.5); }
 
-/* DOOR VIDEO — transition */
-#door-video-wrap { position:absolute; inset:0; opacity:0; pointer-events:none; transition:opacity .6s ease; }
-#door-video-wrap.vis { opacity:1; }
-#door-video { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; }
+/* DOOR VIDEO */
+#dvw { position:absolute; inset:0; opacity:0; pointer-events:none; transition:opacity .6s ease; }
+#dvw.vis { opacity:1; }
+#dv { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
 
-/* WELCOME BUTTON */
-#welcome-wrap {
-  position:absolute; inset:0; z-index:2;
-  display:flex; align-items:flex-end; justify-content:center;
-  padding-bottom:12vh;
-  transition:opacity .8s;
-}
-#welcome-wrap.out { opacity:0; pointer-events:none; }
-#welcome-btn {
-  font-family:var(--f-serif); font-style:italic; font-size:15px;
-  letter-spacing:.5em; color:rgba(255,255,255,.35);
-  cursor:none; background:none; border:none;
-  animation:obPulse 3s ease infinite;
-  transition:color .3s, letter-spacing .4s;
-  padding:16px 24px;
-}
-#welcome-btn:hover { color:rgba(255,255,255,.7); letter-spacing:.65em; }
-@keyframes obPulse { 0%,100%{opacity:.3} 50%{opacity:.65} }
+/* WELCOME */
+#ww { position:absolute; inset:0; z-index:2; display:flex; align-items:flex-end; justify-content:center; padding-bottom:12vh; transition:opacity .8s; }
+#ww.out { opacity:0; pointer-events:none; }
+#wb { font-family:var(--fs); font-style:italic; font-size:15px; letter-spacing:.5em; color:rgba(255,255,255,.35); cursor:none; background:none; border:none; animation:obP 3s ease infinite; transition:color .3s,letter-spacing .4s; padding:16px 24px; text-decoration:none; }
+#wb:hover { color:rgba(255,255,255,.7); letter-spacing:.65em; }
+@keyframes obP { 0%,100%{opacity:.3}50%{opacity:.65} }
 
-/* ══ TUNNEL — centre écran séquentiel ══ */
-#tunnel {
-  position:absolute; inset:0; z-index:3;
-  display:flex; align-items:center; justify-content:center;
-  pointer-events:none;
-}
+/* ══ TUNNEL — centre séquentiel ══ */
+#tunnel { position:absolute; inset:0; z-index:3; display:flex; align-items:center; justify-content:center; pointer-events:none; }
 
-.t-panel {
-  position:absolute;
-  text-align:center;
-  max-width:580px;
-  padding:0 36px;
-  opacity:0;
-  pointer-events:none;
-  transition:opacity .9s ease;
+.tp {
+  position:absolute; text-align:center;
+  max-width:600px; padding:0 40px;
+  opacity:0; pointer-events:none;
+  transition:opacity 1.1s ease;
 }
-.t-panel.vis { opacity:1; pointer-events:all; }
-.t-panel.out { opacity:0; pointer-events:none; }
+.tp.vis { opacity:1; pointer-events:all; }
 
 /* LANG */
-.lang-row { display:flex; align-items:center; justify-content:center; gap:16px; }
-.lang-slash { font-family:var(--f); font-size:12px; font-weight:200; color:rgba(255,255,255,.25); }
-.lang-btn {
-  font-family:var(--f); font-size:12px; font-weight:300;
-  letter-spacing:.45em; text-transform:uppercase;
-  color:rgba(255,255,255,.45); background:none; border:none; cursor:none;
-  padding:10px 6px; position:relative;
-  transition:color .3s, letter-spacing .35s;
+.lang-row { display:flex; align-items:center; justify-content:center; gap:18px; }
+.lang-slash { font-family:var(--f); font-size:12px; font-weight:100; color:rgba(255,255,255,.22); }
+.lbtn {
+  font-family:var(--f); font-size:12px; font-weight:200;
+  letter-spacing:.5em; text-transform:uppercase;
+  color:rgba(255,255,255,.4); background:none; border:none; cursor:none;
+  padding:12px 6px; transition:color .35s,letter-spacing .35s;
+  text-decoration:none;
 }
-.lang-btn::after { content:''; position:absolute; bottom:4px; left:0; right:0; height:1px; background:rgba(255,255,255,.4); transform:scaleX(0); transition:transform .35s; }
-.lang-btn:hover { color:rgba(255,255,255,.9); letter-spacing:.55em; }
-.lang-btn:hover::after,.lang-btn.sel::after { transform:scaleX(1); }
-.lang-btn.sel { color:rgba(255,255,255,.9); }
+.lbtn:hover { color:rgba(255,255,255,.9); letter-spacing:.62em; }
+.lbtn.sel { color:rgba(255,255,255,.9); }
 
 /* SON */
-.sound-txt {
-  font-family:var(--f); font-size:10px; font-weight:300;
-  letter-spacing:.28em; text-transform:uppercase;
-  color:rgba(255,255,255,.4); line-height:2.2;
+.stxt {
+  font-family:var(--f); font-size:9px; font-weight:200;
+  letter-spacing:.32em; text-transform:uppercase;
+  color:rgba(255,255,255,.38); line-height:2.4;
+  text-decoration:none;
 }
 
 /* MANIFESTO */
-.mani-txt {
-  font-family:var(--f-serif); font-style:italic;
+.mtxt {
+  font-family:var(--fs); font-style:italic;
   font-size:14px; line-height:2;
   color:rgba(255,255,255,.38); letter-spacing:.04em;
-  margin-bottom:20px;
+  text-decoration:none;
 }
-.mani-sub {
-  font-family:var(--f); font-size:9px; font-weight:300;
-  letter-spacing:.3em; text-transform:uppercase;
-  color:rgba(255,255,255,.22); line-height:2.2;
+.msub {
+  font-family:var(--f); font-size:8px; font-weight:200;
+  letter-spacing:.32em; text-transform:uppercase;
+  color:rgba(255,255,255,.22); line-height:2.4;
+  text-decoration:none;
 }
 
-/* ENTER / SKIP */
-.action-row { display:flex; align-items:center; justify-content:center; gap:52px; }
+/* ENTER + SKIP */
+.act-col { display:flex; flex-direction:column; align-items:center; gap:20px; }
 .enter-btn {
-  font-family:var(--f); font-size:10px; font-weight:300;
+  font-family:var(--f); font-size:10px; font-weight:200;
   letter-spacing:.55em; text-transform:uppercase;
   color:rgba(255,255,255,.65); background:none; border:none; cursor:none;
   padding:14px 6px; position:relative;
-  transition:color .4s, letter-spacing .4s;
+  transition:color .4s,letter-spacing .4s;
+  text-decoration:none;
 }
 .enter-btn::after { content:''; position:absolute; bottom:6px; left:0; right:0; height:1px; background:rgba(255,255,255,.4); transform:scaleX(0); transition:transform .45s cubic-bezier(.4,0,.2,1); }
 .enter-btn:hover { color:rgba(255,255,255,1); letter-spacing:.68em; }
 .enter-btn:hover::after { transform:scaleX(1); }
 
 .skip-btn {
-  font-family:var(--f); font-size:9px; font-weight:300;
+  font-family:var(--f); font-size:9px; font-weight:200;
   letter-spacing:.4em; text-transform:uppercase;
-  color:rgba(255,255,255,.2); background:none; border:none; cursor:none;
-  padding:14px 6px; position:relative;
+  color:rgba(255,255,255,.35); background:none; border:none; cursor:none;
+  padding:10px 6px; position:relative;
   transition:color .3s;
+  text-decoration:none;
 }
-.skip-btn.locked { pointer-events:none; }
+/* BARRÉ — ligne horizontale par dessus */
+.skip-btn.locked {
+  pointer-events:none;
+  color:rgba(255,255,255,.25);
+}
 .skip-btn.locked::before {
-  content:''; position:absolute;
-  left:0; right:0; top:50%; transform:translateY(-50%);
-  height:1px; background:rgba(255,255,255,.2);
+  content:'';
+  position:absolute;
+  left:-4px; right:-4px;
+  top:50%; transform:translateY(-50%);
+  height:1px;
+  background:rgba(255,255,255,.45);
 }
-.skip-btn:not(.locked):hover { color:rgba(255,255,255,.7); }
+.skip-btn:not(.locked):hover { color:rgba(255,255,255,.8); }
 
 /* ══ INTRO VIDEO ══ */
 #intro-wrap { position:fixed; inset:0; z-index:500; background:#000; opacity:0; pointer-events:none; transition:opacity .6s ease; }
 #intro-wrap.vis { opacity:1; pointer-events:all; }
-#intro-video { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; }
+#intro-video { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
 
 /* RETURN PROMPT */
 #rp { position:fixed; inset:0; z-index:450; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:24px; opacity:0; pointer-events:none; transition:opacity .8s; }
 #rp.vis { opacity:1; pointer-events:all; }
-.rp-t { font-family:var(--f-serif); font-style:italic; font-size:14px; letter-spacing:.4em; color:rgba(255,255,255,.32); text-align:center; }
-.rp-s { font-family:var(--f); font-size:8px; font-weight:300; letter-spacing:.38em; text-transform:uppercase; color:rgba(255,255,255,.14); text-align:center; }
+.rp-t { font-family:var(--fs); font-style:italic; font-size:14px; letter-spacing:.4em; color:rgba(255,255,255,.32); text-align:center; }
+.rp-s { font-family:var(--f); font-size:8px; font-weight:200; letter-spacing:.38em; text-transform:uppercase; color:rgba(255,255,255,.14); text-align:center; }
 .rp-btns { display:flex; gap:40px; }
-.rp-btn { font-family:var(--f); font-size:9px; font-weight:300; letter-spacing:.4em; text-transform:uppercase; color:rgba(255,255,255,.38); background:none; border:none; cursor:none; padding:10px 4px; transition:color .3s,letter-spacing .3s; }
+.rp-btn { font-family:var(--f); font-size:9px; font-weight:200; letter-spacing:.4em; text-transform:uppercase; color:rgba(255,255,255,.38); background:none; border:none; cursor:none; padding:10px 4px; transition:color .3s,letter-spacing .3s; }
 .rp-btn:hover { color:rgba(255,255,255,.9); letter-spacing:.5em; }
 
 @media(max-width:600px){
   #choices { flex-direction:column; height:auto; bottom:8vh; }
   .cbtn { padding:14px 28px; }
   .cbtn+.cbtn::before { width:12px; height:1px; top:0; left:50%; transform:translate(-50%,0); }
-  .mani-txt { font-size:12px; }
-  .action-row { gap:32px; }
-  .t-panel { padding:0 24px; }
+  .mtxt { font-size:12px; }
+  .tp { padding:0 24px; }
 }
 </style>
 </head>
 <body>
 
-<div id="cur">*</div>
+<div id="cur"></div><div id="cur-dot"></div>
 <div id="grain"></div><div id="vig"></div><div id="scan"></div>
 <div class="corner tl"></div><div class="corner tr"></div>
 <div class="corner bl"></div><div class="corner br"></div>
 <div id="prog"><div class="ps" id="ps1"></div><div class="ps" id="ps2"></div><div class="ps" id="ps3"></div><div class="ps" id="ps4"></div></div>
 <div id="lvl">I</div>
 
-<!-- BOTTOM BAR -->
+<!-- BOTTOM BAR — toujours visible dès le tunnel -->
 <div id="bbar">
-  <button class="bb" id="lang-disp">FR</button>
+  <button class="bb-lang" id="lang-disp" onclick="cycleLang()">FR</button>
   <div class="bb-sep"></div>
-  <button id="snd-icon" onclick="toggleSound()">
+  <button id="snd-btn" onclick="toggleSound()">
     <div class="si"></div><div class="si"></div><div class="si"></div>
   </button>
 </div>
@@ -299,54 +273,50 @@ body.hovering #cur { transform:translate(-50%,-50%) scale(1.4); color:rgba(255,2
 <div id="onboard">
   <div id="bg-door"></div>
   <div id="bg-podium"></div>
+  <div id="dvw"><video id="dv" playsinline webkit-playsinline muted></video></div>
 
-  <!-- Door video transition -->
-  <div id="door-video-wrap">
-    <video id="door-video" playsinline webkit-playsinline muted></video>
-  </div>
+  <!-- WELCOME -->
+  <div id="ww"><button id="wb" onclick="startTunnel()">Welcome</button></div>
 
-  <!-- Phase 1 — Welcome -->
-  <div id="welcome-wrap">
-    <button id="welcome-btn" onclick="startTunnel()">Welcome</button>
-  </div>
-
-  <!-- Tunnel — centre écran -->
+  <!-- TUNNEL -->
   <div id="tunnel">
 
-    <!-- Panel LANG -->
-    <div class="t-panel" id="p-lang">
+    <!-- LANG -->
+    <div class="tp" id="p-lang">
       <div class="lang-row">
-        <button class="lang-btn" id="btn-fr" onclick="selectLang('FR')">FR</button>
+        <button class="lbtn" id="btn-fr" onclick="selectLang('FR')">FR</button>
         <span class="lang-slash">/</span>
-        <button class="lang-btn" id="btn-en" onclick="selectLang('EN')">EN</button>
+        <button class="lbtn" id="btn-en" onclick="selectLang('EN')">EN</button>
       </div>
     </div>
 
-    <!-- Panel SON -->
-    <div class="t-panel" id="p-sound">
-      <div class="sound-txt" id="sound-txt">
-        This experience uses sound.<br>You can activate or deactivate it at any time.
-      </div>
+    <!-- SON -->
+    <div class="tp" id="p-sound">
+      <div class="stxt" id="stxt">This experience uses sound.<br>You can activate or deactivate it at any time.</div>
     </div>
 
-    <!-- Panel MANIFESTO -->
-    <div class="t-panel" id="p-mani">
-      <div class="mani-txt" id="mani-txt">
-        Core is more than a brand — it is an ideology in itself.<br>
-        In which those who live, see the world,<br>
-        create and move differently do not chase the basics,<br>
+    <!-- MANIFESTO PART 1 -->
+    <div class="tp" id="p-mani1">
+      <div class="mtxt" id="mtxt1">
+        Core is more than a brand —<br>it is an ideology in itself.<br>
+        In which those who live, see the world, create<br>
+        and move differently do not chase the basics,<br>
         but redefine them.
       </div>
-      <div class="mani-sub" id="mani-sub">
+    </div>
+
+    <!-- MANIFESTO PART 2 -->
+    <div class="tp" id="p-mani2">
+      <div class="msub" id="msub">
         The following experience is called the Core Director Board.<br>
         It is mandatory to go through it as a newcomer.<br>
         Once you return, you will be able to access the shop room directly.
       </div>
     </div>
 
-    <!-- Panel ENTER/SKIP -->
-    <div class="t-panel" id="p-enter">
-      <div class="action-row">
+    <!-- ENTER / SKIP -->
+    <div class="tp" id="p-enter">
+      <div class="act-col">
         <button class="enter-btn" id="enter-btn" onclick="enterUnderground()">Enter the Underground</button>
         <button class="skip-btn locked" id="skip-btn" onclick="doSkip()">Skip</button>
       </div>
@@ -362,17 +332,15 @@ body.hovering #cur { transform:translate(-50%,-50%) scale(1.4); color:rgba(255,2
 
 <!-- RETURN PROMPT -->
 <div id="rp">
-  <div class="rp-t" id="rp-title">You have been here before.</div>
-  <div class="rp-s" id="rp-scene"></div>
+  <div class="rp-t" id="rpt">You have been here before.</div>
+  <div class="rp-s" id="rps"></div>
   <div class="rp-btns">
     <button class="rp-btn" id="rp-continue">Continue →</button>
     <button class="rp-btn" id="rp-restart">Restart</button>
   </div>
 </div>
 
-<!-- MAIN SCENES -->
-<div id="sa"></div>
-<div id="sb"></div>
+<div id="sa"></div><div id="sb"></div>
 <div id="choices">
   <button class="cbtn" id="c0">—</button>
   <button class="cbtn" id="c1">—</button>
@@ -381,184 +349,140 @@ body.hovering #cur { transform:translate(-50%,-50%) scale(1.4); color:rgba(255,2
 <div id="idle">the world goes on without you</div>
 
 <script>
-// ══ CURSOR ASTERISK ══
-const curEl=document.getElementById('cur');
-let mx=0,my=0;
-document.addEventListener('mousemove',e=>{
-  mx=e.clientX; my=e.clientY;
-  curEl.style.left=mx+'px'; curEl.style.top=my+'px';
-});
-
-// RIPPLE ON CLICK
-document.addEventListener('click',e=>{
-  const r=document.createElement('div');
-  r.className='ripple';
-  r.style.left=e.clientX+'px';
-  r.style.top=e.clientY+'px';
-  document.body.appendChild(r);
-  setTimeout(()=>r.remove(),700);
-});
-
-function aH(el){
-  if(!el)return;
-  el.addEventListener('mouseenter',()=>document.body.classList.add('hovering'));
-  el.addEventListener('mouseleave',()=>document.body.classList.remove('hovering'));
-}
+// ══ CURSOR ══
+const curEl=document.getElementById('cur'), curDot=document.getElementById('cur-dot');
+let mx=0,my=0,dx=0,dy=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
+(function aC(){dx+=(mx-dx)*.1;dy+=(my-dy)*.1;curEl.style.left=mx+'px';curEl.style.top=my+'px';curDot.style.left=dx+'px';curDot.style.top=dy+'px';requestAnimationFrame(aC);})();
+function aH(el){if(!el)return;el.addEventListener('mouseenter',()=>document.body.classList.add('hov'));el.addEventListener('mouseleave',()=>document.body.classList.remove('hov'));}
 document.querySelectorAll('button,a').forEach(aH);
 
-// ══ STATE ══
+// ══ VISITS ══
 const isReturn=(()=>{try{return parseInt(localStorage.getItem('cu_visits')||0)>0;}catch(e){return false;}})();
 const savedState=(()=>{try{const ts=parseInt(localStorage.getItem('cu_ts')||0);if(Date.now()-ts>7*24*60*60*1000){localStorage.removeItem('cu_state');return null;}return localStorage.getItem('cu_state');}catch(e){return null;}})();
 (()=>{try{const v=parseInt(localStorage.getItem('cu_visits')||0);localStorage.setItem('cu_visits',v+1);}catch(e){}})();
 
-let selectedLang=localStorage.getItem('cu_lang')||'FR';
+// Unlock skip si retour
+if(isReturn) document.getElementById('skip-btn').classList.remove('locked');
+
+// ══ LANG ══
+let lang=localStorage.getItem('cu_lang')||'FR';
 let soundOn=true;
 
-// Skip unlock si retour
-if(isReturn){ document.getElementById('skip-btn').classList.remove('locked'); }
-
-// ══ TEXTS ══
 const T={
   FR:{
     sound:"Cette expérience utilise le son.<br>Vous pouvez l'activer ou le désactiver à tout moment.",
-    mani:"Core est plus qu'une marque — c'est une idéologie en soi.<br>Ceux qui vivent, voient le monde, créent<br>et évoluent différemment ne courent pas après les bases,<br>ils les redéfinissent.",
-    maniSub:"L'expérience qui suit s'appelle le Core Director Board.<br>Elle est obligatoire pour les nouveaux visiteurs.<br>À votre prochain retour, vous pourrez accéder directement à la boutique.",
+    m1:"Core est plus qu'une marque —<br>c'est une idéologie en soi.<br>Ceux qui vivent, voient le monde, créent<br>et évoluent différemment ne courent pas après les bases,<br>ils les redéfinissent.",
+    m2:"L'expérience qui suit s'appelle le Core Director Board.<br>Elle est obligatoire pour les nouveaux visiteurs.<br>À votre prochain retour, vous pourrez accéder directement à la boutique.",
     enter:"Entrer dans l'Underground",
     skip:"Passer",
-    retTitle:"Tu es déjà venu ici.",
     idle:"le monde continue sans toi",
+    retT:"Tu es déjà venu ici.",
   },
   EN:{
     sound:"This experience uses sound.<br>You can activate or deactivate it at any time.",
-    mani:"Core is more than a brand — it is an ideology in itself.<br>In which those who live, see the world, create<br>and move differently do not chase the basics,<br>but redefine them.",
-    maniSub:"The following experience is called the Core Director Board.<br>It is mandatory to go through it as a newcomer.<br>Once you return, you will be able to access the shop room directly.",
+    m1:"Core is more than a brand —<br>it is an ideology in itself.<br>In which those who live, see the world, create<br>and move differently do not chase the basics,<br>but redefine them.",
+    m2:"The following experience is called the Core Director Board.<br>It is mandatory to go through it as a newcomer.<br>Once you return, you will be able to access the shop room directly.",
     enter:"Enter the Underground",
     skip:"Skip",
-    retTitle:"You have been here before.",
     idle:"the world goes on without you",
+    retT:"You have been here before.",
   }
 };
 
 function applyLang(){
-  const t=T[selectedLang];
-  document.getElementById('sound-txt').innerHTML=t.sound;
-  document.getElementById('mani-txt').innerHTML=t.mani;
-  document.getElementById('mani-sub').innerHTML=t.maniSub;
+  const t=T[lang];
+  document.getElementById('stxt').innerHTML=t.sound;
+  document.getElementById('mtxt1').innerHTML=t.m1;
+  document.getElementById('msub').innerHTML=t.m2;
   document.getElementById('enter-btn').textContent=t.enter;
   document.getElementById('skip-btn').textContent=t.skip;
-  document.getElementById('lang-disp').textContent=selectedLang;
-  document.getElementById('rp-title').textContent=t.retTitle;
+  document.getElementById('lang-disp').textContent=lang;
   document.getElementById('idle').textContent=t.idle;
-  document.getElementById('btn-fr').classList.toggle('sel',selectedLang==='FR');
-  document.getElementById('btn-en').classList.toggle('sel',selectedLang==='EN');
+  document.getElementById('rpt').textContent=t.retT;
+  document.getElementById('btn-fr').classList.toggle('sel',lang==='FR');
+  document.getElementById('btn-en').classList.toggle('sel',lang==='EN');
+  localStorage.setItem('cu_lang',lang);
 }
 applyLang();
 
-// ══ PRELOAD ══
-const INTRO_VIDEOS=['intro_01.mp4','intro_02.mp4','intro_03.mp4'];
-let preloadDone=false;
+// Cycle lang depuis la barre du bas
+function cycleLang(){
+  lang=lang==='FR'?'EN':'FR';
+  applyLang();
+}
+
+// ══ PRELOAD VIDEOS ══
+const INTRO=['intro_01.mp4','intro_02.mp4','intro_03.mp4'];
+let preloaded=false;
 function startPreload(){
-  if(preloadDone)return;
-  preloadDone=true;
-  INTRO_VIDEOS.forEach(src=>{
-    const v=document.createElement('video');
-    v.preload='auto'; v.src=src; v.load(); v.style.display='none';
-    document.body.appendChild(v);
-  });
+  if(preloaded)return; preloaded=true;
+  INTRO.forEach(src=>{const v=document.createElement('video');v.preload='auto';v.src=src;v.load();v.style.display='none';document.body.appendChild(v);});
 }
 
-// ══ TUNNEL SEQUENCE ══
-function showPanel(id, duration, onEnd){
-  const el=document.getElementById(id);
-  el.classList.add('vis');
-  if(duration){
-    setTimeout(()=>{
-      el.classList.remove('vis');
-      el.classList.add('out');
-      setTimeout(()=>{ if(onEnd) onEnd(); },900);
-    }, duration);
-  }
-}
-
-function hidePanel(id, cb){
+// ══ TUNNEL PANELS ══
+function showP(id){ const el=document.getElementById(id); el.classList.add('vis'); return el; }
+function hideP(id,cb){
   const el=document.getElementById(id);
   el.classList.remove('vis');
-  el.classList.add('out');
-  setTimeout(()=>{ if(cb) cb(); },900);
+  setTimeout(()=>{ if(cb)cb(); },1200); // délai plus long pour smooth
 }
 
-let langSelected=false;
+let langChosen=false;
 
 function startTunnel(){
   startPreload();
-  // Si y'a une vidéo de porte, la jouer d'abord
-  const dv=document.getElementById('door-video');
-  const dvw=document.getElementById('door-video-wrap');
-  dv.src='door-open.mp4';
-  dv.load();
+  // Tente de jouer la vidéo porte
+  const dv=document.getElementById('dv'), dvw=document.getElementById('dvw');
+  dv.src='door-open.mp4'; dv.load();
   dv.play().then(()=>{
-    // vidéo porte dispo
     dvw.classList.add('vis');
-    document.getElementById('welcome-wrap').classList.add('out');
-    dv.onended=()=>{
-      dvw.classList.remove('vis');
-      switchToPodium();
-    };
-  }).catch(()=>{
-    // pas de vidéo porte → switch direct
-    switchToPodium();
-  });
+    document.getElementById('ww').classList.add('out');
+    dv.onended=()=>{ dvw.classList.remove('vis'); switchPodium(); };
+  }).catch(()=>switchPodium());
 }
 
-function switchToPodium(){
-  document.getElementById('welcome-wrap').classList.add('out');
-  // Fade bg door → bg podium
+function switchPodium(){
+  document.getElementById('ww').classList.add('out');
   document.getElementById('bg-podium').style.opacity='1';
-  setTimeout(()=>{ document.getElementById('bg-door').style.opacity='0'; },600);
-
+  setTimeout(()=>document.getElementById('bg-door').style.opacity='0',600);
+  // Affiche la barre lang/son
   document.getElementById('bbar').classList.add('vis');
-
-  // Affiche le panel langue après 800ms
-  setTimeout(()=>{
-    showPanel('p-lang', 0, null);
-    // p-lang reste jusqu'au choix de l'utilisateur
-  },800);
+  setTimeout(()=>showP('p-lang'),900);
 }
 
-function selectLang(lang){
-  if(langSelected)return;
-  langSelected=true;
-  selectedLang=lang;
-  localStorage.setItem('cu_lang',lang);
-  applyLang();
-
-  // Blink son icon
-  document.querySelectorAll('.si').forEach(s=>{ s.classList.remove('blink-anim'); void s.offsetWidth; s.classList.add('blink-anim'); });
-
-  // Fade out lang → show son
-  hidePanel('p-lang',()=>{
-    showPanel('p-sound', 5000, ()=>{
-      // Après son → manifesto
-      showPanel('p-mani', 8000, ()=>{
-        // Après manifesto → enter/skip
-        showPanel('p-enter', 0, null);
-      });
-    });
+function selectLang(l){
+  if(langChosen)return;
+  langChosen=true;
+  lang=l; applyLang();
+  // Blink son
+  document.querySelectorAll('.si').forEach(s=>{s.classList.remove('blink');void s.offsetWidth;s.classList.add('blink');});
+  // Séquence : hide lang → son → mani1 → mani2 → enter
+  hideP('p-lang',()=>{
+    showP('p-sound');
+    setTimeout(()=>hideP('p-sound',()=>{
+      showP('p-mani1');
+      setTimeout(()=>hideP('p-mani1',()=>{
+        showP('p-mani2');
+        setTimeout(()=>hideP('p-mani2',()=>{
+          showP('p-enter');
+        }),8000);
+      }),8000);
+    }),6000);
   });
 }
 
 function enterUnderground(){
-  hidePanel('p-enter',()=>{
-    closeOnboard(()=>{
-      document.getElementById('intro-wrap').classList.add('vis');
-      loadIntroClip(0);
-    });
-  });
+  hideP('p-enter',()=>closeOnboard(()=>{
+    document.getElementById('bbar').classList.add('hidden');
+    document.getElementById('intro-wrap').classList.add('vis');
+    loadClip(0);
+  }));
 }
 
 function doSkip(){
   if(!isReturn)return;
-  hidePanel('p-enter',()=>closeOnboard(()=>launchExperienceAt('LOOP_4')));
+  hideP('p-enter',()=>closeOnboard(()=>launchAt('LOOP_4')));
 }
 
 function closeOnboard(cb){
@@ -567,29 +491,27 @@ function closeOnboard(cb){
   setTimeout(()=>{ ob.style.display='none'; if(cb)cb(); },1400);
 }
 
-// ══ INTRO VIDEOS ══
-const introWrap=document.getElementById('intro-wrap');
-const introVideo=document.getElementById('intro-video');
-function loadIntroClip(idx){
-  if(idx>=INTRO_VIDEOS.length){
-    introWrap.style.transition='opacity .6s ease';
-    introWrap.style.opacity='0';
-    setTimeout(()=>{ introWrap.classList.remove('vis'); introWrap.style.opacity=''; introWrap.style.transition=''; launchExperience(); },650);
+// ══ INTRO VIDEO ══
+const iWrap=document.getElementById('intro-wrap'), iVid=document.getElementById('intro-video');
+function loadClip(idx){
+  if(idx>=INTRO.length){
+    iWrap.style.transition='opacity .6s ease'; iWrap.style.opacity='0';
+    setTimeout(()=>{ iWrap.classList.remove('vis'); iWrap.style.opacity=''; iWrap.style.transition=''; launchExp(); },650);
     return;
   }
-  introVideo.src=INTRO_VIDEOS[idx];
-  introVideo.load();
-  introVideo.play().catch(e=>console.log('play:',e));
-  introVideo.onended=()=>loadIntroClip(idx+1);
+  iVid.src=INTRO[idx]; iVid.load();
+  iVid.play().catch(e=>console.log(e));
+  iVid.onended=()=>loadClip(idx+1);
 }
 
 // ══ SOUND ══
 function toggleSound(){
   soundOn=!soundOn;
   document.querySelectorAll('.si').forEach(s=>s.classList.toggle('paused',!soundOn));
-  if(introVideo) introVideo.muted=!soundOn;
+  if(iVid) iVid.muted=!soundOn;
 }
-aH(document.getElementById('snd-icon'));
+aH(document.getElementById('snd-btn'));
+aH(document.getElementById('lang-disp'));
 
 // ══ STATE MACHINE ══
 const ROMAN=['','I','II','III','IV'];
@@ -619,27 +541,17 @@ const choicesEl=document.getElementById('choices');
 const btns=[document.getElementById('c0'),document.getElementById('c1'),document.getElementById('c2')];
 const idleEl=document.getElementById('idle'),rewBtn=document.getElementById('rew');
 
-function mkP(key){
-  const s=SCENES[key];
-  return`<div class="vp ${s.sc}"><div><div class="vn">${s.num}</div><div class="vl">${s.label}</div></div></div>`;
-}
+function mkP(key){const s=SCENES[key];return`<div class="vp ${s.sc}"><div><div class="vn">${s.num}</div><div class="vl">${s.label}</div></div></div>`;}
 function active(){return slot==='a'?sA:sB;}
 function inactive(){return slot==='a'?sB:sA;}
-function setProgress(lvl){
-  [1,2,3,4].forEach(i=>document.getElementById('ps'+i).className='ps'+(i<=lvl?' done':''));
-  document.getElementById('lvl').textContent=ROMAN[lvl]||'';
-}
+function setProgress(lvl){[1,2,3,4].forEach(i=>document.getElementById('ps'+i).className='ps'+(i<=lvl?' done':''));document.getElementById('lvl').textContent=ROMAN[lvl]||'';}
 
 function clearIdle(){if(idleTimer)clearTimeout(idleTimer);if(idleHideTimer)clearTimeout(idleHideTimer);idleEl.classList.remove('vis');}
 function startIdle(){
   clearIdle();
   idleTimer=setTimeout(()=>{
-    choicesEl.style.opacity='0';choicesEl.style.pointerEvents='none';
-    idleEl.classList.add('vis');
-    idleHideTimer=setTimeout(()=>{
-      idleEl.classList.remove('vis');choicesEl.style.opacity='';choicesEl.style.pointerEvents='';
-      startIdle();
-    },20000);
+    choicesEl.style.opacity='0';choicesEl.style.pointerEvents='none';idleEl.classList.add('vis');
+    idleHideTimer=setTimeout(()=>{idleEl.classList.remove('vis');choicesEl.style.opacity='';choicesEl.style.pointerEvents='';startIdle();},20000);
   },25000);
 }
 
@@ -647,16 +559,8 @@ function hideChoices(){if(choicesTimer)clearTimeout(choicesTimer);clearIdle();ch
 function showChoices(key){
   const s=SCENES[key];if(!s.choices)return;
   hideChoices();
-  s.choices.forEach((lbl,i)=>{
-    btns[i].textContent=lbl;
-    btns[i].onclick=()=>handleChoice(key,i);
-    aH(btns[i]);
-  });
-  choicesTimer=setTimeout(()=>{
-    choicesEl.classList.add('vis');
-    btns.forEach((b,i)=>setTimeout(()=>b.classList.add('in'),i*320));
-    startIdle();
-  },3500);
+  s.choices.forEach((lbl,i)=>{btns[i].textContent=lbl;btns[i].onclick=()=>handleChoice(key,i);aH(btns[i]);});
+  choicesTimer=setTimeout(()=>{choicesEl.classList.add('vis');btns.forEach((b,i)=>setTimeout(()=>b.classList.add('in'),i*320));startIdle();},3500);
 }
 
 function haptic(s=false){if(navigator.vibrate)navigator.vibrate(s?[12,8,12]:[8]);}
@@ -670,67 +574,58 @@ function transitionTo(key,type='crossfade'){
   const spd=type==='cut'?'.15s':type==='flash'?'.35s':'1s';
   act.style.transition=`opacity ${spd} ease`;inact.style.transition=`opacity ${spd} ease`;
   if(type==='flash'){act.style.filter='brightness(5)';setTimeout(()=>act.style.filter='',80);}
-  act.style.opacity='0';inact.style.opacity='1';
-  slot=slot==='a'?'b':'a';
+  act.style.opacity='0';inact.style.opacity='1';slot=slot==='a'?'b':'a';
   try{localStorage.setItem('cu_state',key);localStorage.setItem('cu_ts',Date.now());}catch(e){}
   setTimeout(()=>{
     transitioning=false;
     const s=SCENES[key];
     if(s.loop){setProgress(s.lvl);showChoices(key);}
-    else{
-      currentOneTime=key;
-      if(retTimer)clearTimeout(retTimer);
-      retTimer=setTimeout(()=>{rewBtn.classList.remove('vis');if(s.ext)showExt(s.ext);transitionTo(s.ret,'crossfade');},s.dur||6000);
-      setTimeout(()=>rewBtn.classList.add('vis'),2000);
-    }
+    else{currentOneTime=key;if(retTimer)clearTimeout(retTimer);retTimer=setTimeout(()=>{rewBtn.classList.remove('vis');if(s.ext)showExt(s.ext);transitionTo(s.ret,'crossfade');},s.dur||6000);setTimeout(()=>rewBtn.classList.add('vis'),2000);}
   },type==='cut'?200:1100);
 }
 
-function handleChoice(key,idx){
-  const t=SCENES[key].targets[idx];
-  const type=t==='TERRAZZA_3'||t==='POOL_2'?'cut':t==='OPEN_LOOP2'?'flash':'crossfade';
-  transitionTo(t,type);
-}
+function handleChoice(key,idx){const t=SCENES[key].targets[idx];const type=t==='TERRAZZA_3'||t==='POOL_2'?'cut':t==='OPEN_LOOP2'?'flash':'crossfade';transitionTo(t,type);}
 
 function rewatchScene(){
   if(!currentOneTime)return;
   haptic(false);rewBtn.classList.remove('vis');
   const key=currentOneTime;if(retTimer)clearTimeout(retTimer);
   const inact=inactive();inact.innerHTML=mkP(key);inact.style.opacity='0';
-  const act=active();
-  act.style.transition='opacity .5s ease';inact.style.transition='opacity .5s ease';
-  act.style.opacity='0';inact.style.opacity='1';slot=slot==='a'?'b':'a';
-  setTimeout(()=>{
-    retTimer=setTimeout(()=>{rewBtn.classList.remove('vis');const s=SCENES[key];if(s.ext)showExt(s.ext);transitionTo(s.ret,'crossfade');},SCENES[key].dur||6000);
-    setTimeout(()=>rewBtn.classList.add('vis'),2000);
-  },600);
+  const act=active();act.style.transition='opacity .5s ease';inact.style.transition='opacity .5s ease';act.style.opacity='0';inact.style.opacity='1';slot=slot==='a'?'b':'a';
+  setTimeout(()=>{retTimer=setTimeout(()=>{rewBtn.classList.remove('vis');const s=SCENES[key];if(s.ext)showExt(s.ext);transitionTo(s.ret,'crossfade');},SCENES[key].dur||6000);setTimeout(()=>rewBtn.classList.add('vis'),2000);},600);
 }
 aH(rewBtn);
 
 function showExt(type){
   const msgs={about:'↗ About',shop:'↗ Shop',archives:'↗ Archives'};
   const el=document.createElement('div');
-  el.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:250;font-family:Helvetica Neue,Helvetica,Arial,sans-serif;font-size:9px;font-weight:300;letter-spacing:.5em;text-transform:uppercase;color:rgba(255,255,255,.4);opacity:0;transition:opacity .8s;pointer-events:none;';
-  el.textContent=msgs[type]||'';
-  document.body.appendChild(el);
+  el.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:250;font-family:Unbounded,sans-serif;font-size:8px;font-weight:200;letter-spacing:.5em;text-transform:uppercase;color:rgba(255,255,255,.4);opacity:0;transition:opacity .8s;pointer-events:none;';
+  el.textContent=msgs[type]||'';document.body.appendChild(el);
   requestAnimationFrame(()=>{el.style.opacity='1';setTimeout(()=>{el.style.opacity='0';setTimeout(()=>el.remove(),800);},3000);});
 }
 
-function goShop(){ window.open('#shop','_blank'); }
+function goShop(){window.open('#shop','_blank');}
 aH(document.getElementById('shop-link'));
 
-function launchExperience(){ launchExperienceAt(savedState&&SCENES[savedState]?savedState:'LOOP_1'); }
-function launchExperienceAt(key){
+function launchExp(){launchAt(savedState&&SCENES[savedState]?savedState:'LOOP_1');}
+function launchAt(key){
   document.querySelectorAll('.corner').forEach(c=>c.classList.add('vis'));
   document.getElementById('shop-link').classList.add('vis');
   document.getElementById('prog').classList.add('vis');
   document.getElementById('lvl').classList.add('vis');
+  document.getElementById('bbar').classList.add('vis');
+  document.getElementById('bbar').classList.remove('hidden');
   sA.innerHTML=mkP(key);sA.style.opacity='1';sB.style.opacity='0';
-  const s=SCENES[key];
-  setProgress(s.lvl||1);
-  if(s.loop) setTimeout(()=>showChoices(key),1500);
+  const s=SCENES[key];setProgress(s.lvl||1);
+  if(s.loop)setTimeout(()=>showChoices(key),1500);
   else transitionTo(key,'crossfade');
 }
+
+// Return prompt
+const rp=document.getElementById('rp');
+document.getElementById('rp-continue').onclick=()=>{rp.classList.remove('vis');launchAt(savedState&&SCENES[savedState]?savedState:'LOOP_1');};
+document.getElementById('rp-restart').onclick=()=>{rp.classList.remove('vis');try{localStorage.removeItem('cu_state');}catch(e){}launchAt('LOOP_1');};
+[document.getElementById('rp-continue'),document.getElementById('rp-restart')].forEach(aH);
 </script>
 </body>
 </html>

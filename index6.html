@@ -139,12 +139,6 @@ body.hov #cur-dot { opacity:0; }
 #ww.out { opacity:0; pointer-events:none; }
 #wb { font-family:var(--fs); font-style:italic; font-size:15px; letter-spacing:.5em; color:rgba(255,255,255,.35); cursor:none; background:none; border:none; animation:obP 3s ease infinite; transition:color .3s,letter-spacing .4s; padding:16px 24px; text-decoration:none; }
 #wb:hover { color:rgba(255,255,255,.7); letter-spacing:.65em; }
-
-/* OPEN THE DOOR */
-#open-btn-wrap { position:absolute; inset:0; z-index:2; display:flex; align-items:flex-end; justify-content:center; padding-bottom:12vh; opacity:0; pointer-events:none; transition:opacity 1s ease; }
-#open-btn-wrap.vis { opacity:1; pointer-events:all; }
-#open-btn { font-family:var(--fs); font-style:italic; font-size:15px; letter-spacing:.5em; color:rgba(255,255,255,.5); cursor:none; background:none; border:none; animation:obP 2.5s ease infinite; transition:color .3s,letter-spacing .4s; padding:16px 24px; text-decoration:none; }
-#open-btn:hover { color:rgba(255,255,255,.85); letter-spacing:.65em; }
 @keyframes obP { 0%,100%{opacity:.3}50%{opacity:.65} }
 
 /* ══ TUNNEL — centre séquentiel ══ */
@@ -281,10 +275,7 @@ body.hov #cur-dot { opacity:0; }
   <div id="dvw"><video id="dv" playsinline webkit-playsinline muted></video></div>
 
   <!-- WELCOME -->
-  <div id="ww"><button id="wb" onclick="firstClick()">Welcome</button></div>
-
-  <!-- OPEN THE DOOR -->
-  <div id="open-btn-wrap"><button id="open-btn" onclick="startTunnel()">Open the door</button></div>
+  <div id="ww"><button id="wb" onclick="startTunnel()">Welcome</button></div>
 
   <!-- TUNNEL -->
   <div id="tunnel">
@@ -440,32 +431,13 @@ function showP(id){ const el=document.getElementById(id); el.classList.add('vis'
 function hideP(id,cb){
   const el=document.getElementById(id);
   el.classList.remove('vis');
-  setTimeout(()=>{ if(cb)cb(); },1200);
-}
-
-// Premier clic — Welcome
-function firstClick(){
-  // 1. Lance le préchargement de toutes les vidéos
-  startPreload();
-
-  // 2. Fade out et disable complet de "Welcome"
-  const ww=document.getElementById('ww');
-  ww.style.transition='opacity .8s ease';
-  ww.style.opacity='0';
-  ww.style.pointerEvents='none';
-  setTimeout(()=>{ ww.style.display='none'; }, 800);
-
-  // 3. Après 5s — affiche "Open the door"
-  setTimeout(()=>{
-    document.getElementById('open-btn-wrap').classList.add('vis');
-    aH(document.getElementById('open-btn'));
-  }, 5000);
+  setTimeout(()=>{ if(cb)cb(); },1200); // délai plus long pour smooth
 }
 
 let langChosen=false;
 
 function startTunnel(){
-  document.getElementById('open-btn-wrap').classList.remove('vis');
+  startPreload();
   const isMobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
   const doorSrc=isMobile?'door-open-mobile.mp4':'door-open-desktop.mp4';
   const dv=document.getElementById('dv'), dvw=document.getElementById('dvw');
@@ -479,19 +451,13 @@ function startTunnel(){
 
 function switchPodium(){
   document.getElementById('ww').classList.add('out');
+  // 0.5s sur le noir puis fade in progressif 2.5s
   setTimeout(()=>{
     document.getElementById('bg-podium').style.opacity='1';
     setTimeout(()=>document.getElementById('bg-door').style.opacity='0',600);
   },500);
-
-  // ✅ LANG + SON — visibles et fonctionnels DÈS maintenant
-  const ld=document.getElementById('lang-disp');
-  const sb=document.getElementById('snd-btn');
-  const sep=document.getElementById('bb-sep');
-  ld.style.opacity='1'; ld.style.pointerEvents='all';
-  sb.style.opacity='1'; sb.style.pointerEvents='all';
-  if(sep) sep.style.opacity='1';
-
+  document.getElementById('bbar').classList.add('vis');
+  // Lang apparaît seulement après que le bg soit bien visible
   setTimeout(()=>showP('p-lang'),3200);
 }
 
@@ -501,12 +467,21 @@ function selectLang(l){
   lang=l; applyLang();
 
   hideP('p-lang',()=>{
-    // boutons déjà visibles depuis switchPodium — rien à faire ici
+    // ✅ BOUTON LANGUE — visible et fonctionnel dès que le panel lang disparaît, pour toujours
+    const ld=document.getElementById('lang-disp');
+    ld.style.opacity='1'; ld.style.pointerEvents='all';
 
     showP('p-sound');
+    // Blink son icon pour attirer l'attention
     document.querySelectorAll('.si').forEach(s=>{s.classList.remove('blink');void s.offsetWidth;s.classList.add('blink');});
 
     setTimeout(()=>hideP('p-sound',()=>{
+      // ✅ BOUTON SON — visible et fonctionnel dès que le panel son disparaît, pour toujours
+      const sb=document.getElementById('snd-btn');
+      const sep=document.getElementById('bb-sep');
+      sb.style.opacity='1'; sb.style.pointerEvents='all';
+      if(sep) sep.style.opacity='1';
+
       showP('p-mani1');
       setTimeout(()=>hideP('p-mani1',()=>{
         showP('p-mani2');

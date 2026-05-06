@@ -448,12 +448,9 @@ function firstClick(){
   // 1. Lance le préchargement de toutes les vidéos
   startPreload();
 
-  // 2. Fade out et disable complet de "Welcome"
-  const ww=document.getElementById('ww');
-  ww.style.transition='opacity .8s ease';
-  ww.style.opacity='0';
-  ww.style.pointerEvents='none';
-  setTimeout(()=>{ ww.style.display='none'; }, 800);
+  // 2. Fade out "Welcome"
+  document.getElementById('wb').style.opacity='0';
+  document.getElementById('wb').style.pointerEvents='none';
 
   // 3. Après 5s — affiche "Open the door"
   setTimeout(()=>{
